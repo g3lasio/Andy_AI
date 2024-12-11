@@ -131,14 +131,15 @@ export default function AIChat() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || isLoading || isAnalyzing) return;
 
     const userMessage: Message = {
       id: Date.now(),
-      text: input,
+      text: input.trim(),
       sender: 'user'
     };
 
+    const currentInput = input;
     setMessages(prev => [...prev, userMessage]);
     setInput("");
 
@@ -262,8 +263,8 @@ export default function AIChat() {
           onChange={(e) => setInput(e.target.value)}
           placeholder="Escribe tu mensaje..."
           className="flex-1"
-          disabled={false}
-          onKeyPress={(e) => {
+          disabled={isAnalyzing}
+          onKeyDown={(e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault();
               handleSubmit(e);
