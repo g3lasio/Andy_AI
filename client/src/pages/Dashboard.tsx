@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CreditScore from "@/components/CreditScore";
 import FinancialOverview from "@/components/FinancialOverview";
 import TransactionList from "@/components/TransactionList";
-import AIChat from "@/components/AIChat";
+import OnboardingChat from "@/components/OnboardingChat";
 import { useUser } from "@/hooks/use-user";
 import { useFinancialData } from "@/hooks/use-financial-data";
 import CreditReportUpload from "@/components/CreditReportUpload"; // Import the new component
@@ -95,7 +95,7 @@ export default function Dashboard() {
 
           <TabsContent value="ai">
             <Card className="p-6">
-              <AIChat />
+              <OnboardingChat />
             </Card>
           </TabsContent>
           <TabsContent value="credit"> {/* Added tab content for credit report upload */}

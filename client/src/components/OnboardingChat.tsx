@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -28,6 +28,7 @@ export default function OnboardingChat() {
   const { user } = useUser();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [onboardingState, setOnboardingState] = useState<OnboardingState>({
     currentStep: 'welcome',
     data: {}
@@ -54,6 +55,14 @@ Por favor, cuéntame, ¿cuáles son tus principales objetivos financieros? Por e
     };
     setMessages([welcomeMessage]);
   }, [user]);
+
+  useEffect(() => {
+    // Auto-scroll to bottom when new messages arrive
+    if (scrollAreaRef.current) {
+      const scrollArea = scrollAreaRef.current;
+      scrollArea.scrollTop = scrollArea.scrollHeight;
+    }
+  }, [messages]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,7 +98,7 @@ Por favor, cuéntame, ¿cuáles son tus principales objetivos financieros? Por e
           currentStep: onboardingState.currentStep,
           onboardingData: onboardingState.data
         }),
-        credentials: 'include', // Important for session handling
+        credentials: 'include',
       });
 
       if (!response.ok) {
@@ -136,7 +145,7 @@ Por favor, cuéntame, ¿cuáles son tus principales objetivos financieros? Por e
   return (
     <div className="h-[600px] flex flex-col">
       <Card className="flex-1 p-4">
-        <ScrollArea className="h-full pr-4">
+        <ScrollArea className="h-full pr-4" ref={scrollAreaRef}>
           <div className="space-y-4">
             {messages.map((message) => (
               <div
@@ -172,21 +181,24 @@ Por favor, cuéntame, ¿cuáles son tus principales objetivos financieros? Por e
         </ScrollArea>
       </Card>
 
-      <form onSubmit={handleSubmit} className="mt-4 flex gap-2">
+      <form 
+        onSubmit={handleSubmit} 
+        className="mt-4 flex gap-2"
+      >
         <Input
+          type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Escribe tu mensaje..."
           className="flex-1"
-          disabled={false}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              handleSubmit(e);
-            }
-          }}
+          autoComplete="off"
+          aria-label="Mensaje para Andy"
         />
-        <Button type="submit">
+        <Button 
+          type="submit" 
+          disabled={!input.trim()}
+          className="px-4"
+        >
           <Send className="h-4 w-4" />
         </Button>
       </form>
