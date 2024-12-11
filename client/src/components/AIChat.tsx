@@ -29,12 +29,24 @@ export default function AIChat() {
   useEffect(() => {
     const greeting = {
       id: 1,
-      text: `¡Hola ${user?.name || 'amigo'}! 👋 Soy Andy AI, tu asistente financiero personal super amigable! 🤖✨ 
-      \nPara ayudarte mejor, necesitaré algunos documentos como:
-      \n📄 Estados de cuenta bancarios
-      \n📊 Reportes de crédito
-      \n💳 Estados de tarjetas de crédito
-      \n¿Te gustaría empezar compartiendo alguno de estos documentos? Puedes usar el clip 📎 para adjuntarlos.`,
+      text: `¡Hola ${user?.firstName || 'amigo'}! 👋✨ ¡Qué alegría verte por aquí! 
+
+🤖 Soy Andy AI, tu asistente financiero personal más cool y amigable. ¡Estoy aquí para ayudarte a tomar el control de tus finanzas de una manera divertida! 
+
+Para comenzar nuestro viaje financiero juntos, me encantaría analizar algunos documentos importantes:
+
+📄 Estados de cuenta bancarios
+   → Los encuentras en tu app bancaria o email mensual
+📊 Reportes de crédito
+   → Puedes obtenerlos gratis en Buró de Crédito
+💳 Estados de tarjetas de crédito
+   → En tu app de banco o email mensual
+🧾 Facturas y recibos importantes
+   → Los que consideres relevantes
+
+¡No te preocupes! Puedes adjuntar los documentos usando el clip 📎 que está justo abajo a la izquierda. ¡Prometo cuidar muy bien de tu información! 😊
+
+¿Te gustaría empezar compartiendo alguno de estos documentos? ¡Estoy super emocionado por ayudarte! 🌟`,
       sender: 'ai'
     };
     setMessages([greeting]);
@@ -209,19 +221,44 @@ export default function AIChat() {
       )}
 
       {uploadedFiles.length > 0 && (
-        <Card className="mb-4 p-4">
-          <h3 className="text-lg font-semibold mb-2">📚 Documentos en Knowledge Andy</h3>
-          <div className="grid gap-2">
+        <Card className="mb-4 p-4 border-2 border-primary/20">
+          <div className="flex items-center gap-2 mb-4">
+            <h3 className="text-lg font-semibold">📚 Knowledge Andy</h3>
+            <Badge variant="secondary" className="bg-primary/20">
+              {uploadedFiles.length} {uploadedFiles.length === 1 ? 'documento' : 'documentos'}
+            </Badge>
+          </div>
+          <div className="grid gap-3">
             {uploadedFiles.map((file, index) => (
-              <div key={index} className="flex items-center justify-between p-2 bg-muted rounded-lg">
-                <div className="flex items-center gap-2">
-                  <FileText className="h-4 w-4" />
-                  <span>{file.name}</span>
+              <div 
+                key={index} 
+                className="flex items-center justify-between p-3 bg-muted rounded-lg hover:bg-muted/80 transition-colors group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-primary/10 rounded-full group-hover:bg-primary/20 transition-colors">
+                    <FileText className="h-4 w-4 text-primary" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-medium">{file.name}</span>
+                    <span className="text-xs text-muted-foreground">
+                      Añadido el {new Date().toLocaleDateString()}
+                    </span>
+                  </div>
                 </div>
-                <Badge variant="secondary">{file.type}</Badge>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="capitalize">
+                    {file.type}
+                  </Badge>
+                  <Badge variant="secondary" className="bg-primary/20">
+                    Analizado ✓
+                  </Badge>
+                </div>
               </div>
             ))}
           </div>
+          <p className="text-sm text-muted-foreground mt-4">
+            🔒 Tus documentos están seguros en Knowledge Andy. ¡Los uso para darte los mejores consejos financieros!
+          </p>
         </Card>
       )}
 
