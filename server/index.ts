@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { createServer } from "http";
 import { setupVite, serveStatic, log } from "./vite";
 import router from "./routes";
+import onboardingRouter from "./routes/onboarding";
 
 const app = express();
 const server = createServer(app);
@@ -43,6 +44,7 @@ app.use((req, res, next) => {
 
 // Usar las rutas API
 app.use(router);
+app.use('/api/onboarding', onboardingRouter);
 
 // Middleware de manejo de errores global
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
