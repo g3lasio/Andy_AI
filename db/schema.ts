@@ -5,9 +5,18 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").unique().notNull(),
   password: text("password").notNull(),
-  name: text("name"),
-  email: text("email"),
-  createdAt: timestamp("created_at").defaultNow()
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
+  email: text("email").notNull(),
+  phoneNumber: text("phone_number"),
+  dateOfBirth: text("date_of_birth"),
+  address: text("address"),
+  city: text("city"),
+  state: text("state"),
+  zipCode: text("zip_code"),
+  ssn: text("ssn"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at")
 });
 
 export const transactions = pgTable("transactions", {
