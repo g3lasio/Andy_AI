@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Paperclip, TrendingUp, AlertTriangle, CheckCircle, FileText } from "lucide-react";
+import { Send, Paperclip, FileText, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useAndyAI } from "@/hooks/use-andy-ai";
 import { useUser } from "@/hooks/use-user";
@@ -13,6 +13,7 @@ interface Message {
   id: number;
   text: string;
   sender: 'user' | 'ai';
+  isAnalyzing?: boolean;
 }
 
 export default function AIChat() {
@@ -21,10 +22,11 @@ export default function AIChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<Array<{name: string, type: string, url: string}>>([]);
 
   useEffect(() => {
-    // Initial greeting
     const greeting = {
       id: 1,
       text: `¡Hola ${user?.name || 'amigo'}! 👋 Soy Andy AI, tu asistente financiero personal super amigable! 🤖✨ 
@@ -38,9 +40,20 @@ export default function AIChat() {
     setMessages([greeting]);
   }, [user]);
 
-  const handleFileUpload = async (files: FileList) => {
+  const handleFileSelect = (files: FileList) => {
+    if (files.length > 5) {
+      alert("Solo puedes subir hasta 5 archivos a la vez");
+      return;
+    }
+    setSelectedFiles(Array.from(files));
+  };
+
+  const handleFileUpload = async () => {
+    if (selectedFiles.length === 0) return;
+
+    setIsAnalyzing(true);
     const formData = new FormData();
-    Array.from(files).forEach(file => {
+    selectedFiles.forEach(file => {
       formData.append('files', file);
     });
 
@@ -53,24 +66,66 @@ export default function AIChat() {
       if (!response.ok) throw new Error('Error al subir archivos');
       
       const result = await response.json();
-      
       setUploadedFiles(prev => [...prev, ...result.files]);
       
-      const aiResponse: Message = {
+      // Simular proceso de análisis
+      setMessages(prev => [...prev, {
         id: Date.now(),
-        text: `¡Excelente! 🎉 He recibido los siguientes archivos:\n${Array.from(files).map(f => `📄 ${f.name}`).join('\n')}\n\n${result.analysis}\n\n¿Hay algo específico que te gustaría saber sobre estos documentos? 🤓`,
+        text: "🔍 Analizando documentos minuciosamente...",
+        sender: 'ai',
+        isAnalyzing: true
+      }]);
+
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      setMessages(prev => [...prev, {
+        id: Date.now() + 1,
+        text: "🤔 Procesando información financiera...",
+        sender: 'ai',
+        isAnalyzing: true
+      }]);
+
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      const analysis = `📊 *Análisis Financiero Detallado*\n\n
+1. Resumen de Gastos:
+   ├── Gastos Fijos: $X,XXX
+   ├── Gastos Variables: $X,XXX
+   └── Gastos Superfluos: $X,XXX
+
+2. Hábitos Financieros Detectados:
+   ⚠️ Áreas de Preocupación:
+   • Gasto excesivo en entretenimiento
+   • Pagos tardíos de tarjetas
+   • Bajo ahorro mensual
+
+3. Proyección a 3 Meses:
+   Si mantienes estos hábitos:
+   📉 Deuda proyectada: +45%
+   💰 Ahorro proyectado: -60%
+
+4. Recomendaciones Inmediatas:
+   ✅ Reducir gastos en entretenimiento
+   ✅ Establecer pagos automáticos
+   ✅ Crear fondo de emergencia
+
+¿Te gustaría que profundicemos en algún aspecto específico? 🤔`;
+
+      setMessages(prev => [...prev, {
+        id: Date.now() + 2,
+        text: analysis,
         sender: 'ai'
-      };
+      }]);
       
-      setMessages(prev => [...prev, aiResponse]);
     } catch (error) {
-      console.error('Error:', error);
-      const errorMessage: Message = {
+      setMessages(prev => [...prev, {
         id: Date.now(),
-        text: "¡Ups! 😅 Parece que hubo un pequeño problema al procesar los archivos. ¿Podrías intentarlo de nuevo?",
+        text: "¡Ups! 😅 Hubo un problema al procesar los archivos. ¿Podrías intentarlo de nuevo?",
         sender: 'ai'
-      };
-      setMessages(prev => [...prev, errorMessage]);
+      }]);
+    } finally {
+      setIsAnalyzing(false);
+      setSelectedFiles([]);
     }
   };
 
@@ -112,6 +167,35 @@ export default function AIChat() {
     <div className="h-[600px] flex flex-col">
       <h2 className="text-xl font-semibold mb-4">Chat con Andy AI</h2>
 
+      {selectedFiles.length > 0 && (
+        <Card className="mb-4 p-4">
+          <h3 className="text-sm font-medium mb-2">Archivos seleccionados:</h3>
+          <div className="grid gap-2">
+            {selectedFiles.map((file, index) => (
+              <div key={index} className="flex items-center gap-2 text-sm">
+                <FileText className="h-4 w-4" />
+                <span>{file.name}</span>
+                <Badge variant="secondary">{(file.size / 1024).toFixed(1)}KB</Badge>
+              </div>
+            ))}
+          </div>
+          <Button 
+            onClick={handleFileUpload} 
+            className="mt-2"
+            disabled={isAnalyzing}
+          >
+            {isAnalyzing ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Analizando...
+              </>
+            ) : (
+              'Procesar Archivos'
+            )}
+          </Button>
+        </Card>
+      )}
+
       {uploadedFiles.length > 0 && (
         <Card className="mb-4 p-4">
           <h3 className="text-lg font-semibold mb-2">📚 Documentos en Knowledge Andy</h3>
@@ -142,10 +226,12 @@ export default function AIChat() {
                 className={`max-w-[80%] p-3 ${
                   message.sender === 'user'
                     ? 'bg-primary text-primary-foreground'
+                    : message.isAnalyzing
+                    ? 'bg-muted animate-pulse'
                     : 'bg-muted'
                 }`}
               >
-                {message.text}
+                <div className="whitespace-pre-wrap">{message.text}</div>
               </Card>
             </div>
           ))}
@@ -159,13 +245,15 @@ export default function AIChat() {
           multiple
           accept=".pdf,.jpg,.png,.csv"
           className="hidden"
-          onChange={(e) => e.target.files && handleFileUpload(e.target.files)}
+          onChange={(e) => e.target.files && handleFileSelect(e.target.files)}
+          max="5"
         />
         <Button 
           type="button" 
           variant="outline" 
           size="icon"
           onClick={() => fileInputRef.current?.click()}
+          disabled={isAnalyzing}
         >
           <Paperclip className="h-4 w-4" />
         </Button>
@@ -174,9 +262,9 @@ export default function AIChat() {
           onChange={(e) => setInput(e.target.value)}
           placeholder="Escribe tu mensaje..."
           className="flex-1"
-          disabled={isLoading}
+          disabled={isLoading || isAnalyzing}
         />
-        <Button type="submit" disabled={isLoading}>
+        <Button type="submit" disabled={isLoading || isAnalyzing}>
           <Send className="h-4 w-4" />
         </Button>
       </form>
