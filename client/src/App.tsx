@@ -8,6 +8,15 @@ import { useUser } from "@/hooks/use-user";
 import { Loader2 } from "lucide-react";
 
 function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AppContent />
+      <Toaster />
+    </QueryClientProvider>
+  );
+}
+
+function AppContent() {
   const { user, isLoading } = useUser();
 
   if (isLoading) {
@@ -23,13 +32,10 @@ function App() {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <Switch>
-        <Route path="/" component={Dashboard} />
-        <Route>404 - Página no encontrada</Route>
-      </Switch>
-      <Toaster />
-    </QueryClientProvider>
+    <Switch>
+      <Route path="/" component={Dashboard} />
+      <Route>404 - Página no encontrada</Route>
+    </Switch>
   );
 }
 
