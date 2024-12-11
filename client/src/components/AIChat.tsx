@@ -139,28 +139,36 @@ export default function AIChat() {
       sender: 'user'
     };
 
-    const currentInput = input;
     setMessages(prev => [...prev, userMessage]);
     setInput("");
+
+    // Mensaje de "escribiendo..."
+    const typingMessage: Message = {
+      id: Date.now() + 1,
+      text: "Andy está escribiendo...",
+      sender: 'ai',
+      isTyping: true
+    };
+    setMessages(prev => [...prev, typingMessage]);
 
     try {
       const result = await sendMessage(input);
       
-      const aiResponse: Message = {
-        id: Date.now() + 1,
+      // Eliminar mensaje de "escribiendo..." y agregar respuesta
+      setMessages(prev => prev.filter(m => !m.isTyping).concat({
+        id: Date.now() + 2,
         text: result.response,
         sender: 'ai'
-      };
+      }));
 
-      setMessages(prev => [...prev, aiResponse]);
+      // Reproducir sonido de notificación
+      new Audio('/notification.mp3').play().catch(() => {});
     } catch (error) {
-      const errorMessage: Message = {
-        id: Date.now() + 1,
-        text: "¡Oops! 😅 Tuve un pequeño tropiezo. ¿Podrías repetir eso?",
+      setMessages(prev => prev.filter(m => !m.isTyping).concat({
+        id: Date.now() + 2,
+        text: "¡Oops! 😅 Hubo un error al procesar tu mensaje. ¿Podrías intentarlo de nuevo?",
         sender: 'ai'
-      };
-
-      setMessages(prev => [...prev, errorMessage]);
+      }));
     }
   };
 
@@ -226,13 +234,23 @@ export default function AIChat() {
               <Card
                 className={`max-w-[80%] p-3 ${
                   message.sender === 'user'
-                    ? 'bg-primary text-primary-foreground'
-                    : message.isAnalyzing
-                    ? 'bg-muted animate-pulse'
-                    : 'bg-muted'
+                    ? 'bg-primary text-primary-foreground shadow-lg'
+                    : message.isTyping
+                    ? 'bg-muted animate-pulse shadow'
+                    : 'bg-muted shadow hover:shadow-md transition-shadow'
                 }`}
               >
-                <div className="whitespace-pre-wrap">{message.text}</div>
+                <div className="whitespace-pre-wrap">
+                  {message.sender === 'ai' && !message.isTyping && '🤖 '}
+                  {message.text}
+                </div>
+                {message.isTyping && (
+                  <div className="flex gap-1 mt-1">
+                    <span className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                    <span className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                    <span className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                  </div>
+                )}
               </Card>
             </div>
           ))}

@@ -14,19 +14,25 @@ const openai = new OpenAI({
 // Verificar conexión con OpenAI
 async function checkOpenAIConnection() {
   try {
-    await openai.chat.completions.create({
+    const response = await openai.chat.completions.create({
       model: "gpt-4",
-      messages: [{ role: "system", content: "Test connection" }]
+      messages: [{ role: "system", content: "Test connection" }],
+      max_tokens: 5
     });
-    console.log('Conexión con OpenAI establecida correctamente');
+    console.log('Conexión con OpenAI (GPT-4) establecida correctamente');
+    console.log('Modelo en uso:', response.model);
     return true;
   } catch (error) {
     console.error('Error de conexión con OpenAI:', error);
-    return false;
+    throw new Error('No se pudo establecer conexión con OpenAI');
   }
 }
 
-checkOpenAIConnection();
+// Verificar conexión al iniciar
+checkOpenAIConnection().catch(error => {
+  console.error('Error crítico:', error.message);
+  process.exit(1);
+});
 
 export async function analyzeFile(files: Array<{name: string, type: string, url: string}>) {
   const fileContents = await Promise.all(
