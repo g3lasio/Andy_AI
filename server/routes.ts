@@ -5,6 +5,11 @@ import path from "path";
 import { analyzeFile } from "./ai";
 
 const router = Router();
+
+// Ruta de prueba
+router.get('/api/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
 const upload = multer({
   storage: multer.diskStorage({
     destination: './uploads',
