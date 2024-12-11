@@ -21,7 +21,7 @@ export default function Dashboard() {
           <h1 className="text-4xl font-bold text-foreground">
             Bienvenido, {user?.name || user?.username}
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-gray-200">
             Tu asistente financiero personal está aquí para ayudarte
           </p>
         </header>
