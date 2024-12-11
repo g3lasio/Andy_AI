@@ -24,7 +24,9 @@ export default function AIChat() {
   ]);
   const [input, setInput] = useState("");
 
-  const handleFileUpload = async (files: FileList) => {
+  const [uploadedFiles, setUploadedFiles] = useState<Array<{name: string, type: string, url: string}>>([]);
+
+const handleFileUpload = async (files: FileList) => {
   const formData = new FormData();
   Array.from(files).forEach(file => {
     formData.append('files', file);
@@ -39,9 +41,14 @@ export default function AIChat() {
     if (!response.ok) throw new Error('Error al subir archivos');
     
     const result = await response.json();
+    
+    // Add uploaded files to state
+    setUploadedFiles(prev => [...prev, ...result.files]);
+    
+    // Generate AI analysis message
     const aiResponse: Message = {
       id: Date.now(),
-      text: result.analysis,
+      text: `He analizado los siguientes archivos:\n${Array.from(files).map(f => `- ${f.name}`).join('\n')}\n\n${result.analysis}`,
       sender: 'ai',
       timestamp: new Date()
     };
@@ -49,6 +56,11 @@ export default function AIChat() {
     setMessages(prev => [...prev, aiResponse]);
   } catch (error) {
     console.error('Error:', error);
+    toast({
+      title: "Error",
+      description: "No se pudieron procesar los archivos",
+      variant: "destructive"
+    });
   }
 };
 
@@ -93,6 +105,22 @@ const handleSubmit = async (e: React.FormEvent) => {
     <div className="h-[600px] flex flex-col">
       <h2 className="text-xl font-semibold mb-4">Chat con Andy AI</h2>
 
+      {uploadedFiles.length > 0 && (
+        <Card className="mb-4 p-4">
+          <h3 className="text-lg font-semibold mb-2">Archivos Analizados</h3>
+          <div className="grid gap-2">
+            {uploadedFiles.map((file, index) => (
+              <div key={index} className="flex items-center justify-between p-2 bg-muted rounded-lg">
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  <span>{file.name}</span>
+                </div>
+                <Badge variant="secondary">{file.type}</Badge>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
       <ScrollArea className="flex-1 pr-4">
         <div className="space-y-4">
           {messages.map((message) => (
