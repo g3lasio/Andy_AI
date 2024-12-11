@@ -14,13 +14,22 @@ const openai = new OpenAI({
 // Verificar conexión con OpenAI
 async function checkOpenAIConnection() {
   try {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('API Key de OpenAI no configurada');
+    }
+    
     const response = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [{ role: "system", content: "Test connection" }],
       max_tokens: 5
     });
-    console.log('Conexión con OpenAI (GPT-4) establecida correctamente');
-    console.log('Modelo en uso:', response.model);
+    
+    if (!response.model.includes('gpt-4')) {
+      throw new Error('No se está usando GPT-4. Modelo actual: ' + response.model);
+    }
+    
+    console.log('✅ Conexión con OpenAI (GPT-4) establecida correctamente');
+    console.log('🤖 Modelo en uso:', response.model);
     return true;
   } catch (error) {
     console.error('Error de conexión con OpenAI:', error);

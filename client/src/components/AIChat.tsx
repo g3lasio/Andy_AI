@@ -131,7 +131,10 @@ export default function AIChat() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isLoading || isAnalyzing) return;
+    if (!input.trim() || isLoading || isAnalyzing) {
+      new Audio('/error.mp3').play().catch(() => {});
+      return;
+    }
 
     const userMessage: Message = {
       id: Date.now(),

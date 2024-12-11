@@ -26,20 +26,32 @@ async function sendMessage(message: string): Promise<{
   response: string;
   analysis?: AIAnalysis;
 }> {
-  const response = await fetch('/api/chat', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ message }),
-    credentials: 'include',
-  });
+  try {
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ message }),
+      credentials: 'include',
+    });
 
-  if (!response.ok) {
-    throw new Error('Error al enviar el mensaje');
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(error || 'Error en la comunicación con el servidor');
+    }
+
+    const data = await response.json();
+    
+    if (!data.response) {
+      throw new Error('Respuesta inválida del servidor');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error en la comunicación:', error);
+    throw new Error('Lo siento, hubo un problema al procesar tu mensaje. ¿Podrías intentarlo de nuevo?');
   }
-
-  return response.json();
 }
 
 export function useAndyAI() {
