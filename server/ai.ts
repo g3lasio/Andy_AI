@@ -3,9 +3,30 @@ import { OpenAI } from 'openai';
 import fs from 'fs/promises';
 import pdf from 'pdf-parse';
 
+if (!process.env.OPENAI_API_KEY) {
+  throw new Error('OPENAI_API_KEY no está configurada en las variables de entorno');
+}
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
+
+// Verificar conexión con OpenAI
+async function checkOpenAIConnection() {
+  try {
+    await openai.chat.completions.create({
+      model: "gpt-4",
+      messages: [{ role: "system", content: "Test connection" }]
+    });
+    console.log('Conexión con OpenAI establecida correctamente');
+    return true;
+  } catch (error) {
+    console.error('Error de conexión con OpenAI:', error);
+    return false;
+  }
+}
+
+checkOpenAIConnection();
 
 export async function analyzeFile(files: Array<{name: string, type: string, url: string}>) {
   const fileContents = await Promise.all(

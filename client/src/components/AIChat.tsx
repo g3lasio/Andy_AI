@@ -262,7 +262,13 @@ export default function AIChat() {
           onChange={(e) => setInput(e.target.value)}
           placeholder="Escribe tu mensaje..."
           className="flex-1"
-          disabled={isLoading || isAnalyzing}
+          disabled={false}
+          onKeyPress={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              handleSubmit(e);
+            }
+          }}
         />
         <Button type="submit" disabled={isLoading || isAnalyzing}>
           <Send className="h-4 w-4" />
