@@ -36,7 +36,7 @@ app.use((req, res, next) => {
   next();
 });
 
-import router from "./routes";
+import router from "./routes.js";
 
 (async () => {
   // Usar las rutas
