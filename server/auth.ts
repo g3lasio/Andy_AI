@@ -143,14 +143,20 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/login", (req, res, next) => {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).send("Usuario y contraseña son requeridos");
+    }
+
     passport.authenticate("local", (err, user, info) => {
       if (err) return next(err);
       if (!user) {
-        return res.status(400).send(info?.message || "Error de inicio de sesión");
+        return res.status(400).send(info?.message || "Usuario o contraseña incorrectos");
       }
       req.logIn(user, (err) => {
         if (err) return next(err);
         return res.json({
+          ok: true,
           message: "Inicio de sesión exitoso",
           user: { id: user.id, username: user.username },
         });
