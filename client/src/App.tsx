@@ -17,19 +17,12 @@ function App() {
 }
 
 function AppContent() {
-  const { user, isLoading } = useUser();
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <AuthPage />;
-  }
+  // Usuario temporal para desarrollo
+  const tempUser = {
+    id: 1,
+    username: "usuario_prueba",
+    name: "Usuario de Prueba"
+  };
 
   return (
     <Switch>
