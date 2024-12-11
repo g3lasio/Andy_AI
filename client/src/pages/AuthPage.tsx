@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Eye, EyeOff, CheckCircle } from "lucide-react";
 import { useUser } from "@/hooks/use-user";
 import { toast } from "@/hooks/use-toast";
 
@@ -24,6 +25,7 @@ type FormData = {
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
   const { login, register } = useUser();
   const form = useForm<FormData>({
     defaultValues: {
@@ -156,20 +158,52 @@ export default function AuthPage() {
 
           <div className="space-y-2">
             <Label htmlFor="username">Usuario</Label>
-            <Input
-              id="username"
-              {...form.register("username", { required: true })}
-            />
+            <div className="relative">
+              <Input
+                id="username"
+                {...form.register("username", { required: true })}
+              />
+              {form.formState.isValid && form.getValues("username") && (
+                <CheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-green-500" />
+              )}
+            </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="password">Contraseña</Label>
-            <Input
-              id="password"
-              type="password"
-              {...form.register("password", { required: true })}
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                {...form.register("password", { required: true })}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2"
+              >
+                {showPassword ? (
+                  <Eye className="h-4 w-4 text-gray-500" />
+                ) : (
+                  <EyeOff className="h-4 w-4 text-gray-500" />
+                )}
+              </button>
+            </div>
           </div>
+
+          {isLogin && (
+            <Button
+              variant="link"
+              type="button"
+              onClick={() => toast({
+                title: "Recuperar contraseña",
+                description: "Función en desarrollo. Próximamente disponible."
+              })}
+              className="text-sm px-0"
+            >
+              ¿Olvidaste tu contraseña?
+            </Button>
+          )}
 
           <Button type="submit" className="w-full">
             {isLogin ? "Iniciar Sesión" : "Registrarse"}
