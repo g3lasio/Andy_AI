@@ -66,12 +66,12 @@ export function setupAuth(app: Express) {
           .limit(1);
 
         if (!user) {
-          return done(null, false, { message: "Usuario incorrecto" });
+          return done(null, false, { message: "El usuario no existe" });
         }
 
         const isMatch = await crypto.compare(password, user.password);
         if (!isMatch) {
-          return done(null, false, { message: "Contraseña incorrecta" });
+          return done(null, false, { message: "La contraseña es incorrecta" });
         }
 
         return done(null, user);
@@ -151,7 +151,10 @@ export function setupAuth(app: Express) {
     passport.authenticate("local", (err, user, info) => {
       if (err) return next(err);
       if (!user) {
-        return res.status(400).send(info?.message || "Usuario o contraseña incorrectos");
+        return res.status(401).json({
+          error: true,
+          message: info?.message || "Usuario o contraseña incorrectos"
+        });
       }
       req.logIn(user, (err) => {
         if (err) return next(err);
