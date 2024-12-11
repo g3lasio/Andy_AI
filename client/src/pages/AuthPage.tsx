@@ -15,7 +15,12 @@ type FormData = {
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const { login, register } = useUser();
-  const form = useForm<FormData>();
+  const form = useForm<FormData>({
+    defaultValues: {
+      username: "",
+      password: ""
+    }
+  });
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -28,11 +33,13 @@ export default function AuthPage() {
         title: isLogin ? "Inicio de sesión exitoso" : "Registro exitoso",
         description: "Bienvenido a Andy AI"
       });
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error.message || "Error durante la autenticación";
+      console.error("Auth error:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message
+        description: errorMessage
       });
     }
   };
