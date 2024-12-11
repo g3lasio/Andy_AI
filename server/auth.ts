@@ -172,16 +172,27 @@ export function setupAuth(app: Express) {
       return res.status(400).send("Usuario y contraseña son requeridos");
     }
 
-    passport.authenticate("local", (err, user, info) => {
-      if (err) return next(err);
+    passport.authenticate("local", async (err, user, info) => {
+      if (err) {
+        console.error("Auth error:", err);
+        return next(err);
+      }
+      
       if (!user) {
+        console.log("Login failed:", info);
         return res.status(401).json({
           error: true,
           message: info?.message || "Usuario o contraseña incorrectos"
         });
       }
-      req.logIn(user, (err) => {
-        if (err) return next(err);
+
+      try {
+        await new Promise((resolve, reject) => {
+          req.logIn(user, (err) => {
+            if (err) reject(err);
+            else resolve(user);
+          });
+        });
         return res.json({
           ok: true,
           message: "Inicio de sesión exitoso",
