@@ -1,10 +1,13 @@
-import { useState, useEffect } from "react";
+
+import { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, TrendingUp, AlertTriangle, CheckCircle } from "lucide-react";
+import { Send, Paperclip, TrendingUp, AlertTriangle, CheckCircle, FileText } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { useAndyAI } from "@/hooks/use-andy-ai";
+import { useUser } from "@/hooks/use-user";
 
 interface Message {
   id: number;
@@ -13,66 +16,72 @@ interface Message {
 }
 
 export default function AIChat() {
+  const { user } = useUser();
   const { sendMessage, analysis, isLoading } = useAndyAI();
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 1,
-      text: "¡Hola! Soy Andy AI, tu asistente financiero personal. ¿En qué puedo ayudarte hoy?",
-      sender: 'ai',
-      timestamp: new Date()
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
-
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadedFiles, setUploadedFiles] = useState<Array<{name: string, type: string, url: string}>>([]);
 
-const handleFileUpload = async (files: FileList) => {
-  const formData = new FormData();
-  Array.from(files).forEach(file => {
-    formData.append('files', file);
-  });
-
-  try {
-    const response = await fetch('/api/chat/upload', {
-      method: 'POST',
-      body: formData,
-    });
-    
-    if (!response.ok) throw new Error('Error al subir archivos');
-    
-    const result = await response.json();
-    
-    // Add uploaded files to state
-    setUploadedFiles(prev => [...prev, ...result.files]);
-    
-    // Generate AI analysis message
-    const aiResponse: Message = {
-      id: Date.now(),
-      text: `He analizado los siguientes archivos:\n${Array.from(files).map(f => `- ${f.name}`).join('\n')}\n\n${result.analysis}`,
-      sender: 'ai',
-      timestamp: new Date()
+  useEffect(() => {
+    // Initial greeting
+    const greeting = {
+      id: 1,
+      text: `¡Hola ${user?.name || 'amigo'}! 👋 Soy Andy AI, tu asistente financiero personal super amigable! 🤖✨ 
+      \nPara ayudarte mejor, necesitaré algunos documentos como:
+      \n📄 Estados de cuenta bancarios
+      \n📊 Reportes de crédito
+      \n💳 Estados de tarjetas de crédito
+      \n¿Te gustaría empezar compartiendo alguno de estos documentos? Puedes usar el clip 📎 para adjuntarlos.`,
+      sender: 'ai'
     };
-    
-    setMessages(prev => [...prev, aiResponse]);
-  } catch (error) {
-    console.error('Error:', error);
-    toast({
-      title: "Error",
-      description: "No se pudieron procesar los archivos",
-      variant: "destructive"
-    });
-  }
-};
+    setMessages([greeting]);
+  }, [user]);
 
-const handleSubmit = async (e: React.FormEvent) => {
+  const handleFileUpload = async (files: FileList) => {
+    const formData = new FormData();
+    Array.from(files).forEach(file => {
+      formData.append('files', file);
+    });
+
+    try {
+      const response = await fetch('/api/chat/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) throw new Error('Error al subir archivos');
+      
+      const result = await response.json();
+      
+      setUploadedFiles(prev => [...prev, ...result.files]);
+      
+      const aiResponse: Message = {
+        id: Date.now(),
+        text: `¡Excelente! 🎉 He recibido los siguientes archivos:\n${Array.from(files).map(f => `📄 ${f.name}`).join('\n')}\n\n${result.analysis}\n\n¿Hay algo específico que te gustaría saber sobre estos documentos? 🤓`,
+        sender: 'ai'
+      };
+      
+      setMessages(prev => [...prev, aiResponse]);
+    } catch (error) {
+      console.error('Error:', error);
+      const errorMessage: Message = {
+        id: Date.now(),
+        text: "¡Ups! 😅 Parece que hubo un pequeño problema al procesar los archivos. ¿Podrías intentarlo de nuevo?",
+        sender: 'ai'
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now(),
       text: input,
-      sender: 'user',
-      timestamp: new Date()
+      sender: 'user'
     };
 
     setMessages(prev => [...prev, userMessage]);
@@ -84,17 +93,15 @@ const handleSubmit = async (e: React.FormEvent) => {
       const aiResponse: Message = {
         id: Date.now() + 1,
         text: result.response,
-        sender: 'ai',
-        timestamp: new Date()
+        sender: 'ai'
       };
 
       setMessages(prev => [...prev, aiResponse]);
     } catch (error) {
       const errorMessage: Message = {
         id: Date.now() + 1,
-        text: "Lo siento, hubo un error al procesar tu mensaje. Por favor, intenta de nuevo.",
-        sender: 'ai',
-        timestamp: new Date()
+        text: "¡Oops! 😅 Tuve un pequeño tropiezo. ¿Podrías repetir eso?",
+        sender: 'ai'
       };
 
       setMessages(prev => [...prev, errorMessage]);
@@ -107,7 +114,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
       {uploadedFiles.length > 0 && (
         <Card className="mb-4 p-4">
-          <h3 className="text-lg font-semibold mb-2">Archivos Analizados</h3>
+          <h3 className="text-lg font-semibold mb-2">📚 Documentos en Knowledge Andy</h3>
           <div className="grid gap-2">
             {uploadedFiles.map((file, index) => (
               <div key={index} className="flex items-center justify-between p-2 bg-muted rounded-lg">
@@ -121,6 +128,7 @@ const handleSubmit = async (e: React.FormEvent) => {
           </div>
         </Card>
       )}
+
       <ScrollArea className="flex-1 pr-4">
         <div className="space-y-4">
           {messages.map((message) => (
@@ -144,62 +152,23 @@ const handleSubmit = async (e: React.FormEvent) => {
         </div>
       </ScrollArea>
 
-      {analysis && (
-        <Card className="mb-4 p-4 bg-muted/50">
-          <h3 className="text-lg font-semibold mb-2">Análisis Financiero</h3>
-          
-          <div className="grid gap-4 md:grid-cols-3">
-            <div>
-              <h4 className="font-medium flex items-center gap-2">
-                <TrendingUp className="h-4 w-4" />
-                Salud Financiera
-              </h4>
-              <p className="text-sm text-muted-foreground">
-                {analysis.financialHealth.status}
-              </p>
-            </div>
-
-            <div>
-              <h4 className="font-medium flex items-center gap-2">
-                {analysis.futureProjection.trend === 'positive' ? (
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                ) : analysis.futureProjection.trend === 'negative' ? (
-                  <AlertTriangle className="h-4 w-4 text-red-500" />
-                ) : (
-                  <TrendingUp className="h-4 w-4 text-yellow-500" />
-                )}
-                Proyección Futura
-              </h4>
-              <p className="text-sm text-muted-foreground">
-                {analysis.futureProjection.reasons[0]}
-              </p>
-            </div>
-
-            <div>
-              <h4 className="font-medium">Consejo Principal</h4>
-              <p className="text-sm text-muted-foreground">
-                {analysis.creditAdvice[0]}
-              </p>
-            </div>
-          </div>
-        </Card>
-      )}
-
-      <div className="flex items-center gap-2 mb-4">
+      <form onSubmit={handleSubmit} className="mt-4 flex gap-2">
         <input
           type="file"
+          ref={fileInputRef}
           multiple
-          accept=".pdf,.jpg,.png"
+          accept=".pdf,.jpg,.png,.csv"
+          className="hidden"
           onChange={(e) => e.target.files && handleFileUpload(e.target.files)}
-          className="block w-full text-sm text-slate-500
-            file:mr-4 file:py-2 file:px-4
-            file:rounded-full file:border-0
-            file:text-sm file:font-semibold
-            file:bg-violet-50 file:text-violet-700
-            hover:file:bg-violet-100"
         />
-      </div>
-      <form onSubmit={handleSubmit} className="mt-4 flex gap-2">
+        <Button 
+          type="button" 
+          variant="outline" 
+          size="icon"
+          onClick={() => fileInputRef.current?.click()}
+        >
+          <Paperclip className="h-4 w-4" />
+        </Button>
         <Input
           value={input}
           onChange={(e) => setInput(e.target.value)}
