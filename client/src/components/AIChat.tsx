@@ -24,7 +24,35 @@ export default function AIChat() {
   ]);
   const [input, setInput] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleFileUpload = async (files: FileList) => {
+  const formData = new FormData();
+  Array.from(files).forEach(file => {
+    formData.append('files', file);
+  });
+
+  try {
+    const response = await fetch('/api/chat/upload', {
+      method: 'POST',
+      body: formData,
+    });
+    
+    if (!response.ok) throw new Error('Error al subir archivos');
+    
+    const result = await response.json();
+    const aiResponse: Message = {
+      id: Date.now(),
+      text: result.analysis,
+      sender: 'ai',
+      timestamp: new Date()
+    };
+    
+    setMessages(prev => [...prev, aiResponse]);
+  } catch (error) {
+    console.error('Error:', error);
+  }
+};
+
+const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
@@ -129,6 +157,20 @@ export default function AIChat() {
         </Card>
       )}
 
+      <div className="flex items-center gap-2 mb-4">
+        <input
+          type="file"
+          multiple
+          accept=".pdf,.jpg,.png"
+          onChange={(e) => e.target.files && handleFileUpload(e.target.files)}
+          className="block w-full text-sm text-slate-500
+            file:mr-4 file:py-2 file:px-4
+            file:rounded-full file:border-0
+            file:text-sm file:font-semibold
+            file:bg-violet-50 file:text-violet-700
+            hover:file:bg-violet-100"
+        />
+      </div>
       <form onSubmit={handleSubmit} className="mt-4 flex gap-2">
         <Input
           value={input}
