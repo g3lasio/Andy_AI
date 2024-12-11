@@ -7,11 +7,27 @@ import { analyzeFile } from "./ai";
 
 const router = Router();
 
+import { promisify } from 'util';
+import { mkdir } from 'fs/promises';
+
 // Asegurar que el directorio de uploads existe
-const uploadDir = './uploads';
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
+const uploadDir = path.join(process.cwd(), 'uploads');
+
+const initializeUploadDirectory = async () => {
+  try {
+    await mkdir(uploadDir, { recursive: true });
+    console.log('✅ Directorio de uploads inicializado correctamente');
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'EEXIST') {
+      console.error('❌ Error al crear directorio de uploads:', error);
+      throw error;
+    }
+    console.log('ℹ️ El directorio de uploads ya existe');
+  }
+};
+
+// Inicializar el directorio
+await initializeUploadDirectory();
 
 // Configuración de multer con validaciones y límites
 const storage = multer.diskStorage({
@@ -94,12 +110,14 @@ router.post('/api/chat/upload', upload.array('files'), handleMulterError, async 
     console.error('Error en el procesamiento de archivos:', error);
     // Limpieza de archivos en caso de error
     if (req.files) {
-      const uploadedFiles = Array.isArray(req.files) ? req.files : [req.files];
-      uploadedFiles.forEach(file => {
-        fs.unlink(file.path, (err) => {
-          if (err) console.error(`Error eliminando archivo ${file.path}:`, err);
-        });
-      });
+      const uploadedFiles = req.files as Express.Multer.File[];
+      for (const file of uploadedFiles) {
+        try {
+          await fs.promises.unlink(file.path);
+        } catch (err) {
+          console.error(`Error eliminando archivo ${file.path}:`, err);
+        }
+      }
     }
     res.status(500).json({ error: 'Error en el procesamiento de archivos' });
   }

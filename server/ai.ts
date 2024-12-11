@@ -1,11 +1,20 @@
 import { OpenAI } from 'openai';
 import fs from 'fs/promises';
-import { existsSync, mkdirSync } from 'fs';
+import { existsSync } from 'fs';
 import path from 'path';
 import { promisify } from 'util';
-import * as pdfParse from 'pdf-parse';
 import mammoth from 'mammoth';
 import sizeOf from 'image-size';
+
+// Importación dinámica de pdf-parse para evitar problemas de inicialización
+const getPdfParse = async () => {
+  try {
+    return (await import('pdf-parse')).default;
+  } catch (error) {
+    console.error('Error al cargar pdf-parse:', error);
+    throw new Error('No se pudo cargar el módulo pdf-parse');
+  }
+};
 
 // Verificar variables de entorno
 if (!process.env.OPENAI_API_KEY) {
@@ -13,10 +22,23 @@ if (!process.env.OPENAI_API_KEY) {
 }
 
 // Asegurar que el directorio de uploads existe
-const uploadDir = './uploads';
-if (!existsSync(uploadDir)) {
-  mkdirSync(uploadDir, { recursive: true });
-}
+const uploadDir = path.join(process.cwd(), 'uploads');
+
+const initializeUploadDirectory = async () => {
+  try {
+    await fs.mkdir(uploadDir, { recursive: true });
+    console.log('✅ Directorio de uploads inicializado correctamente');
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'EEXIST') {
+      console.error('❌ Error al crear directorio de uploads:', error);
+      throw error;
+    }
+    console.log('ℹ️ El directorio de uploads ya existe');
+  }
+};
+
+// Inicializar el directorio
+await initializeUploadDirectory();
 
 // Configuración de OpenAI
 const openai = new OpenAI({
@@ -87,7 +109,11 @@ async function extractTextFromFile(filePath: string, type: string): Promise<stri
           if (!content || content.length === 0) {
             throw new Error('El archivo PDF está vacío');
           }
-          const pdfData = await pdfParse(content);
+          const pdfParse = await getPdfParse();
+          const pdfData = await pdfParse(content, {
+            max: 0, // Sin límite de páginas
+            version: 'v2.0.550'
+          });
           if (!pdfData || !pdfData.text) {
             throw new Error('No se pudo extraer texto del PDF');
           }
