@@ -14,6 +14,7 @@ interface Message {
   text: string;
   sender: 'user' | 'ai';
   isAnalyzing?: boolean;
+  isTyping?: boolean;
 }
 
 export default function AIChat() {
@@ -144,7 +145,6 @@ Para comenzar nuestro viaje financiero juntos, me encantaría analizar algunos d
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading || isAnalyzing) {
-      new Audio('/error.mp3').play().catch(() => {});
       return;
     }
 
@@ -160,30 +160,36 @@ Para comenzar nuestro viaje financiero juntos, me encantaría analizar algunos d
     // Mensaje de "escribiendo..."
     const typingMessage: Message = {
       id: Date.now() + 1,
-      text: "Andy está escribiendo...",
+      text: "Andy está escribiendo... ✨",
       sender: 'ai',
       isTyping: true
     };
     setMessages(prev => [...prev, typingMessage]);
 
     try {
-      const result = await sendMessage(input);
+      const result = await sendMessage(userMessage.text);
       
       // Eliminar mensaje de "escribiendo..." y agregar respuesta
-      setMessages(prev => prev.filter(m => !m.isTyping).concat({
-        id: Date.now() + 2,
-        text: result.response,
-        sender: 'ai'
-      }));
+      setMessages(prev => {
+        const filteredMessages = prev.filter(m => !m.isTyping);
+        return [...filteredMessages, {
+          id: Date.now() + 2,
+          text: result.response,
+          sender: 'ai'
+        }];
+      });
 
       // Reproducir sonido de notificación
-      new Audio('/notification.mp3').play().catch(() => {});
+      new Audio('/notification.mp3').play().catch(console.error);
     } catch (error) {
-      setMessages(prev => prev.filter(m => !m.isTyping).concat({
-        id: Date.now() + 2,
-        text: "¡Oops! 😅 Hubo un error al procesar tu mensaje. ¿Podrías intentarlo de nuevo?",
-        sender: 'ai'
-      }));
+      setMessages(prev => {
+        const filteredMessages = prev.filter(m => !m.isTyping);
+        return [...filteredMessages, {
+          id: Date.now() + 2,
+          text: "¡Oops! 😅 Parece que tuve un pequeño problema al procesar tu mensaje. ¿Podrías intentarlo de nuevo? ¡Prometo hacerlo mejor esta vez! 🙏",
+          sender: 'ai'
+        }];
+      });
     }
   };
 
