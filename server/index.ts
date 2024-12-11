@@ -36,9 +36,10 @@ app.use((req, res, next) => {
   next();
 });
 
+import router from "./routes";
+
 (async () => {
-  // Importar y usar las rutas
-  import router from "./routes";
+  // Usar las rutas
   app.use(router);
   
   const server = require('http').createServer(app);
