@@ -14,9 +14,10 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview");
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-4">
-        <header className="mb-8">
+    <div className="min-h-screen bg-gradient-to-b from-black to-zinc-900">
+      <div className="container mx-auto p-4 relative">
+        <div className="absolute inset-0 bg-grid-white/[0.02] -z-10"></div>
+        <header className="mb-8 neon-glow">
           <h1 className="text-4xl font-bold text-foreground">
             Bienvenido, {user?.name || user?.username}
           </h1>

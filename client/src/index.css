@@ -8,6 +8,26 @@
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    @apply font-sans antialiased bg-gradient-to-b from-black to-zinc-900 text-foreground;
+  }
+
+  .neon-glow {
+    @apply relative;
+    text-shadow: 0 0 10px rgba(147, 51, 234, 0.5),
+                 0 0 20px rgba(147, 51, 234, 0.3),
+                 0 0 30px rgba(147, 51, 234, 0.2);
+  }
+
+  .card-glow {
+    @apply relative overflow-hidden;
+    background: linear-gradient(45deg, rgba(147, 51, 234, 0.1), rgba(59, 130, 246, 0.1));
+    border: 1px solid rgba(147, 51, 234, 0.2);
+    backdrop-filter: blur(10px);
+  }
+
+  .card-glow::before {
+    content: '';
+    @apply absolute inset-0 opacity-30;
+    background: radial-gradient(circle at 50% 0%, rgba(147, 51, 234, 0.4), transparent 70%);
   }
 }
