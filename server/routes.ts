@@ -155,5 +155,45 @@ export function registerRoutes(app: Express) {
     }
   });
 
+  // Upload credit report endpoint
+  app.post("/api/credit/upload-report", upload.single('report'), async (req, res) => {
+    if (!req.user) return res.status(401).send("No autenticado");
+    if (!req.file) return res.status(400).send("No se subió ningún archivo");
+
+    try {
+      // Guardar metadatos del reporte
+      const reportId = await db.insert(creditReports).values({
+        userId: req.user.id,
+        reportDate: new Date(),
+        bureau: req.body.bureau,
+        rawData: req.file.path,
+        status: 'pending_analysis'
+      });
+
+      // Iniciar análisis asíncrono
+      analyzeFinancialData([], { 
+        id: reportId,
+        userId: req.user.id,
+        reportDate: new Date(),
+        bureau: req.body.bureau,
+        rawData: req.file.path
+      }).then(async (analysis) => {
+        // Actualizar reporte con resultados
+        await db.update(creditReports)
+          .set({ 
+            status: 'analyzed',
+            score: analysis.financialHealth.score,
+            analysis: JSON.stringify(analysis)
+          })
+          .where(eq(creditReports.id, reportId));
+      });
+
+      res.json({ success: true, reportId });
+    } catch (error) {
+      console.error("Error processing report:", error);
+      res.status(500).send("Error procesando el reporte");
+    }
+  });
+
   return httpServer;
 }

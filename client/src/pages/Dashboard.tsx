@@ -7,6 +7,7 @@ import TransactionList from "@/components/TransactionList";
 import AIChat from "@/components/AIChat";
 import { useUser } from "@/hooks/use-user";
 import { useFinancialData } from "@/hooks/use-financial-data";
+import CreditReportUpload from "@/components/CreditReportUpload"; // Import the new component
 
 export default function Dashboard() {
   const { user } = useUser();
@@ -30,7 +31,7 @@ export default function Dashboard() {
           <Card className="p-6">
             <CreditScore score={creditScore} loading={loading} />
           </Card>
-          
+
           <Card className="p-6 md:col-span-2">
             <FinancialOverview />
           </Card>
@@ -95,6 +96,13 @@ export default function Dashboard() {
           <TabsContent value="ai">
             <Card className="p-6">
               <AIChat />
+            </Card>
+          </TabsContent>
+          <TabsContent value="credit"> {/* Added tab content for credit report upload */}
+            <Card className="p-6">
+              <div className="grid gap-4">
+                <CreditReportUpload />
+              </div>
             </Card>
           </TabsContent>
         </Tabs>
