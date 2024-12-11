@@ -33,12 +33,49 @@ export default function Dashboard() {
           <Card className="p-6 md:col-span-2">
             <FinancialOverview />
           </Card>
+
+          <Card className="p-6 col-span-full">
+            <div className="space-y-2">
+              <h2 className="text-xl font-semibold">Plan de Acción Personalizado</h2>
+              <p className="text-muted-foreground">
+                Basado en tu perfil financiero, Andy AI ha creado un plan personalizado:
+              </p>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div className="p-4 border rounded-lg">
+                  <h3 className="font-medium mb-2">Mejora de Crédito</h3>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li>• Identificar y disputar reportes negativos</li>
+                    <li>• Plan de pagos para mejorar historial</li>
+                    <li>• Estrategias para aumentar límites</li>
+                  </ul>
+                </div>
+                <div className="p-4 border rounded-lg">
+                  <h3 className="font-medium mb-2">Optimización de Gastos</h3>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li>• Análisis de gastos hormiga</li>
+                    <li>• Revisión de suscripciones</li>
+                    <li>• Detección de gastos duplicados</li>
+                  </ul>
+                </div>
+                <div className="p-4 border rounded-lg">
+                  <h3 className="font-medium mb-2">Oportunidades de Crecimiento</h3>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li>• Opciones de inversión personalizadas</li>
+                    <li>• Estrategias de ingresos pasivos</li>
+                    <li>• Metas financieras a largo plazo</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </Card>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-8">
           <TabsList>
             <TabsTrigger value="overview">Vista General</TabsTrigger>
+            <TabsTrigger value="credit">Crédito</TabsTrigger>
             <TabsTrigger value="transactions">Transacciones</TabsTrigger>
+            <TabsTrigger value="planning">Planificación</TabsTrigger>
             <TabsTrigger value="ai">Andy AI</TabsTrigger>
           </TabsList>
 
