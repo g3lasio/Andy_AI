@@ -65,10 +65,11 @@ Por favor, cuéntame, ¿cuáles son tus principales objetivos financieros? Por e
       sender: 'user'
     };
 
+    // Immediately update UI with user message
     setMessages(prev => [...prev, userMessage]);
-    setInput("");
+    setInput(""); // Clear input right after sending
 
-    // Add typing indicator
+    // Show typing indicator
     const typingMessage: Message = {
       id: Date.now() + 1,
       text: "Andy está escribiendo... ✨",
@@ -78,7 +79,6 @@ Por favor, cuéntame, ¿cuáles son tus principales objetivos financieros? Por e
     setMessages(prev => [...prev, typingMessage]);
 
     try {
-      // TODO: Replace with actual API call
       const response = await fetch('/api/onboarding/chat', {
         method: 'POST',
         headers: {
@@ -89,7 +89,12 @@ Por favor, cuéntame, ¿cuáles son tus principales objetivos financieros? Por e
           currentStep: onboardingState.currentStep,
           onboardingData: onboardingState.data
         }),
+        credentials: 'include', // Important for session handling
       });
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
 
       const result = await response.json();
 
@@ -112,7 +117,11 @@ Por favor, cuéntame, ¿cuáles son tus principales objetivos financieros? Por e
         }));
       }
 
+      // Play notification sound
+      new Audio('/notification.mp3').play().catch(console.error);
+
     } catch (error) {
+      console.error('Error en el chat:', error);
       setMessages(prev => {
         const filtered = prev.filter(m => !m.isTyping);
         return [...filtered, {
@@ -169,6 +178,13 @@ Por favor, cuéntame, ¿cuáles son tus principales objetivos financieros? Por e
           onChange={(e) => setInput(e.target.value)}
           placeholder="Escribe tu mensaje..."
           className="flex-1"
+          disabled={false}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              handleSubmit(e);
+            }
+          }}
         />
         <Button type="submit">
           <Send className="h-4 w-4" />
