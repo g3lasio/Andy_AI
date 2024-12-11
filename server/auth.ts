@@ -35,8 +35,32 @@ declare global {
   }
 }
 
+async function createTestUser(db: any) {
+  try {
+    const [existingUser] = await db
+      .select()
+      .from(users)
+      .where(eq(users.username, "test"))
+      .limit(1);
+
+    if (!existingUser) {
+      const hashedPassword = await crypto.hash("test123");
+      await db.insert(users).values({
+        username: "test",
+        password: hashedPassword,
+      });
+      console.log("Usuario de prueba creado: test/test123");
+    }
+  } catch (error) {
+    console.error("Error creando usuario de prueba:", error);
+  }
+}
+
 export function setupAuth(app: Express) {
   const MemoryStore = createMemoryStore(session);
+  
+  // Crear usuario de prueba
+  createTestUser(db);
   
   app.use(
     session({
