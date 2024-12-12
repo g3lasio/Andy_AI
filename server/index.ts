@@ -65,10 +65,18 @@ const startServer = async () => {
       serveStatic(app);
     }
 
-    const PORT = 5000;
-    server.listen(PORT, "0.0.0.0", () => {
-      log(`✅ Servidor iniciado en puerto ${PORT}`);
-    });
+    const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+    const VITE_PORT = 5173;
+    
+    if (app.get("env") === "development") {
+      server.listen(VITE_PORT, "0.0.0.0", () => {
+        log(`✅ Servidor de desarrollo iniciado en puerto ${VITE_PORT}`);
+      });
+    } else {
+      server.listen(PORT, "0.0.0.0", () => {
+        log(`✅ Servidor iniciado en puerto ${PORT}`);
+      });
+    }
   } catch (error) {
     console.error('❌ Error al iniciar el servidor:', error);
     process.exit(1);
