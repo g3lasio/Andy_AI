@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
-import { Send } from "lucide-react";
+import { Send, Paperclip } from "lucide-react";
 import { useUser } from "@/hooks/use-user";
 
 interface Message {
@@ -63,6 +63,18 @@ Por favor, cuéntame, ¿cuáles son tus principales objetivos financieros? Por e
       scrollArea.scrollTop = scrollArea.scrollHeight;
     }
   }, [messages]);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  const handleFileSelect = (files: FileList) => {
+    if (files.length > 5) {
+      alert("Solo puedes subir hasta 5 archivos a la vez");
+      return;
+    }
+    setSelectedFiles(Array.from(files));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -181,24 +193,40 @@ Por favor, cuéntame, ¿cuáles son tus principales objetivos financieros? Por e
         </ScrollArea>
       </Card>
 
-      <form 
-        onSubmit={handleSubmit} 
-        className="mt-4 flex gap-2"
-      >
+      <form onSubmit={handleSubmit} className="mt-4 flex gap-2">
+        <input
+          type="file"
+          ref={fileInputRef}
+          multiple
+          accept=".pdf,.jpg,.png,.csv"
+          className="hidden"
+          onChange={(e) => e.target.files && handleFileSelect(e.target.files)}
+          max="5"
+        />
+        <Button 
+          type="button" 
+          variant="outline" 
+          size="icon"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isAnalyzing}
+        >
+          <Paperclip className="h-4 w-4" />
+        </Button>
         <Input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Escribe tu mensaje..."
           className="flex-1"
-          autoComplete="off"
-          aria-label="Mensaje para Andy"
+          disabled={isAnalyzing}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              handleSubmit(e);
+            }
+          }}
         />
-        <Button 
-          type="submit" 
-          disabled={!input.trim()}
-          className="px-4"
-        >
+        <Button type="submit" disabled={!input.trim() || isAnalyzing}>
           <Send className="h-4 w-4" />
         </Button>
       </form>

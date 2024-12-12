@@ -142,11 +142,13 @@ Para comenzar nuestro viaje financiero juntos, me encantaría analizar algunos d
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading || isAnalyzing) {
-      return;
-    }
+    const handleSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      if (input.trim() === '') return;
+      // Lógica para enviar el mensaje
+      setInput(''); // Limpia el campo de texto
+    };
+
 
     const userMessage: Message = {
       id: Date.now(),
