@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -17,7 +16,11 @@ interface Message {
   isTyping?: boolean;
 }
 
-export default function AIChat() {
+interface AIChatProps {
+  className?: string;
+}
+
+export default function AIChat({ className }: AIChatProps) {
   const { user } = useUser();
   const { sendMessage, analysis, isLoading } = useAndyAI();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -28,7 +31,7 @@ export default function AIChat() {
   const [uploadedFiles, setUploadedFiles] = useState<Array<{name: string, type: string, url: string}>>([]);
 
   useEffect(() => {
-    const greeting = {
+    const greeting: Message = {
       id: 1,
       text: `¡Hola ${user?.firstName || 'amigo'}! 👋✨ ¡Qué alegría verte por aquí! 
 
@@ -91,16 +94,8 @@ Para comenzar nuestro viaje financiero juntos, me encantaría analizar algunos d
 
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      setMessages(prev => [...prev, {
-        id: Date.now() + 1,
-        text: "🤔 Procesando información financiera...",
-        sender: 'ai',
-        isAnalyzing: true
-      }]);
+      const analysis = `📊 *Análisis Financiero Detallado*
 
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      const analysis = `📊 *Análisis Financiero Detallado*\n\n
 1. Resumen de Gastos:
    ├── Gastos Fijos: $X,XXX
    ├── Gastos Variables: $X,XXX
@@ -142,13 +137,9 @@ Para comenzar nuestro viaje financiero juntos, me encantaría analizar algunos d
     }
   };
 
-    const handleSubmit = (e: React.FormEvent) => {
-      e.preventDefault();
-      if (input.trim() === '') return;
-      // Lógica para enviar el mensaje
-      setInput(''); // Limpia el campo de texto
-    };
-
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (input.trim() === '') return;
 
     const userMessage: Message = {
       id: Date.now(),
@@ -196,114 +187,43 @@ Para comenzar nuestro viaje financiero juntos, me encantaría analizar algunos d
   };
 
   return (
-    <div className="h-[600px] flex flex-col">
-      <h2 className="text-xl font-semibold mb-4">Chat con Andy AI</h2>
-
-      {selectedFiles.length > 0 && (
-        <Card className="mb-4 p-4">
-          <h3 className="text-sm font-medium mb-2">Archivos seleccionados:</h3>
-          <div className="grid gap-2">
-            {selectedFiles.map((file, index) => (
-              <div key={index} className="flex items-center gap-2 text-sm">
-                <FileText className="h-4 w-4" />
-                <span>{file.name}</span>
-                <Badge variant="secondary">{(file.size / 1024).toFixed(1)}KB</Badge>
-              </div>
-            ))}
-          </div>
-          <Button 
-            onClick={handleFileUpload} 
-            className="mt-2"
-            disabled={isAnalyzing}
-          >
-            {isAnalyzing ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Analizando...
-              </>
-            ) : (
-              'Procesar Archivos'
-            )}
-          </Button>
-        </Card>
-      )}
-
-      {uploadedFiles.length > 0 && (
-        <Card className="mb-4 p-4 border-2 border-primary/20">
-          <div className="flex items-center gap-2 mb-4">
-            <h3 className="text-lg font-semibold">📚 Knowledge Andy</h3>
-            <Badge variant="secondary" className="bg-primary/20">
-              {uploadedFiles.length} {uploadedFiles.length === 1 ? 'documento' : 'documentos'}
-            </Badge>
-          </div>
-          <div className="grid gap-3">
-            {uploadedFiles.map((file, index) => (
-              <div 
-                key={index} 
-                className="flex items-center justify-between p-3 bg-muted rounded-lg hover:bg-muted/80 transition-colors group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-primary/10 rounded-full group-hover:bg-primary/20 transition-colors">
-                    <FileText className="h-4 w-4 text-primary" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="font-medium">{file.name}</span>
-                    <span className="text-xs text-muted-foreground">
-                      Añadido el {new Date().toLocaleDateString()}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="capitalize">
-                    {file.type}
-                  </Badge>
-                  <Badge variant="secondary" className="bg-primary/20">
-                    Analizado ✓
-                  </Badge>
-                </div>
-              </div>
-            ))}
-          </div>
-          <p className="text-sm text-muted-foreground mt-4">
-            🔒 Tus documentos están seguros en Knowledge Andy. ¡Los uso para darte los mejores consejos financieros!
-          </p>
-        </Card>
-      )}
-
-      <ScrollArea className="flex-1 pr-4">
-        <div className="space-y-4">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${
-                message.sender === 'user' ? 'justify-end' : 'justify-start'
-              }`}
-            >
-              <Card
-                className={`max-w-[80%] p-3 ${
-                  message.sender === 'user'
-                    ? 'bg-primary text-primary-foreground shadow-lg'
-                    : message.isTyping
-                    ? 'bg-muted animate-pulse shadow'
-                    : 'bg-muted shadow hover:shadow-md transition-shadow'
+    <div className={`h-full flex flex-col ${className}`}>
+      <Card className="flex-1 p-4">
+        <ScrollArea className="h-full pr-4">
+          <div className="space-y-4">
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex ${
+                  message.sender === 'user' ? 'justify-end' : 'justify-start'
                 }`}
               >
-                <div className="whitespace-pre-wrap">
-                  {message.sender === 'ai' && !message.isTyping && '🤖 '}
-                  {message.text}
-                </div>
-                {message.isTyping && (
-                  <div className="flex gap-1 mt-1">
-                    <span className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                    <span className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                    <span className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                <Card
+                  className={`max-w-[80%] p-3 ${
+                    message.sender === 'user'
+                      ? 'bg-primary text-primary-foreground'
+                      : message.isTyping
+                      ? 'bg-muted animate-pulse'
+                      : 'bg-muted'
+                  }`}
+                >
+                  <div className="whitespace-pre-wrap">
+                    {message.sender === 'ai' && !message.isTyping && '🤖 '}
+                    {message.text}
                   </div>
-                )}
-              </Card>
-            </div>
-          ))}
-        </div>
-      </ScrollArea>
+                  {message.isTyping && (
+                    <div className="flex gap-1 mt-1">
+                      <span className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                      <span className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                      <span className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                    </div>
+                  )}
+                </Card>
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
+      </Card>
 
       <form onSubmit={handleSubmit} className="mt-4 flex gap-2">
         <input
@@ -337,7 +257,7 @@ Para comenzar nuestro viaje financiero juntos, me encantaría analizar algunos d
             }
           }}
         />
-        <Button type="submit" disabled={isLoading || isAnalyzing}>
+        <Button type="submit" disabled={!input.trim() || isAnalyzing}>
           <Send className="h-4 w-4" />
         </Button>
       </form>
