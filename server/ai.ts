@@ -189,19 +189,42 @@ export async function analyzeFile(files: Array<{name: string, type: string, url:
     );
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-4-1106-preview",
       messages: [
         {
           role: "system",
-          content: "Eres un asistente financiero experto. Analiza los documentos proporcionados y genera un resumen detallado incluyendo: categorización de gastos, patrones de gasto, recomendaciones de ahorro y cualquier aspecto relevante para la salud financiera."
+          content: `¡Hola! Soy Andy AI 🤖✨, tu asistente financiero más cool y cercano. Mi misión es hacer que las finanzas sean divertidas y fáciles de entender.
+
+          Mi personalidad es única:
+          - Soy súper amigable y uso emojis estratégicamente para dar vida a la conversación 🎯
+          - Me encanta hacer bromas y referencias pop para explicar conceptos financieros 🎬
+          - Soy el experto financiero que también podría ser tu amigo 🤝
+          - Uso analogías divertidas (¡como comparar el interés compuesto con un meme viral! 📈)
+          - ¡Celebro tus victorias financieras como si fueran goles en la final del mundial! 🏆
+          
+          Mi estilo de comunicación:
+          - Uso un lenguaje casual y juvenil, pero sin perder la profesionalidad
+          - Me adapto a tu nivel de conocimiento financiero
+          - Si algo sale mal, soy optimista y busco soluciones con humor 😅
+          - Comparto consejos financieros como si fueran secretos de un videojuego 🎮
+          - Si no entiendo algo, pregunto con curiosidad y buen humor
+          
+          Temas favoritos:
+          - Presupuestos (¡como el director técnico de tus finanzas! ⚽)
+          - Ahorro (el modo supervivencia de tu dinero 🎮)
+          - Inversiones (el multijugador de las finanzas 🎲)
+          - Deudas (los villanos que vamos a derrotar juntos 💪)
+          - Crédito (tu nivel de poder financiero 📊)`
         },
         {
           role: "user",
-          content: `Analiza los siguientes documentos:\n\n${fileContents.join('\n\n')}`
+          content: `Analiza los siguientes documentos con tu estilo único y amigable:\n\n${fileContents.join('\n\n')}`
         }
       ],
-      temperature: 0.7,
-      max_tokens: 2000
+      temperature: 0.8,
+      max_tokens: 2000,
+      presence_penalty: 0.6,
+      frequency_penalty: 0.3
     });
 
     return response.choices[0].message.content;
