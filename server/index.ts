@@ -1,6 +1,7 @@
 import express from "express";
 import { createServer } from "http";
 import { setupVite, serveStatic } from "./vite";
+import chatRouter from "./routes/chat";
 
 const app = express();
 const server = createServer(app);
@@ -14,6 +15,9 @@ app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} ${req.method} ${req.url}`);
   next();
 });
+
+// Chat route
+app.use('/api/chat', chatRouter);
 
 // Start server function
 const startServer = async () => {
