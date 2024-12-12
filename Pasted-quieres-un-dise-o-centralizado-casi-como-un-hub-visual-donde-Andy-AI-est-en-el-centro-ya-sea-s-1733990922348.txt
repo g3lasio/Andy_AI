@@ -1,0 +1,45 @@
+quieres un diseño centralizado, casi como un “hub” visual, donde Andy AI esté en el centro (ya sea su ícono o la ventana de chat), y alrededor se muestren las diferentes áreas de funcionalidad representadas por íconos o secciones. Visualmente, la referencia del “reactor de Iron Man” o un átomo con orbitales es muy clara: el centro es el núcleo (Andy AI), y a su alrededor giran varias órbitas con funciones clave.
+
+Concepto de Diseño
+Centro (Núcleo):
+
+Andy AI Chatbox: Una sección en el centro de la pantalla que representa a Andy AI. Puede ser un círculo que, al hacer clic, expanda el chat o muestre su interfaz. Allí el usuario interactúa de manera conversacional, recibe asesoramiento y puede pedir ayuda sobre cualquier subtema.
+Anillo u “Órbitas” Alrededor:
+
+Alrededor del núcleo, distribuye íconos representando las áreas principales. Por ejemplo, podrías tener dos grandes "anillos":
+
+Primer Anillo (Áreas Principales):
+
+Monitoreo de Crédito: Un ícono relacionado a puntaje de crédito (por ejemplo, un medidor o un escudo con la letra "C").
+Finanzas Personales: Un ícono de una billetera, un signo de dólar o una gráfica de barras.
+Estos dos íconos podrían ser más grandes que el resto, indicando que son las dos funciones primordiales.
+
+Segundo Anillo (Subtemas):
+
+Bajo el ícono de "Monitoreo de Crédito":
+Ícono para "Reporte de Crédito"
+Ícono para "Disputas / Cartas"
+Ícono para "Mejora de Puntaje"
+Ícono para "Historial y Tendencias"
+Bajo el ícono de "Finanzas Personales":
+Ícono para "Ingresos vs Gastos"
+Ícono para "Suscripciones"
+Ícono para "Detección de Fraudes"
+Ícono para "Predicciones Futuras"
+Estos íconos más pequeños podrían estar distribuidos alrededor de cada ícono principal, creando una sensación de múltiples órbitas. Cada uno, al hacer hover/click, podría desplegar información o llevar a pantallas dedicadas.
+
+Interacción y Animación:
+
+Al pasar el cursor sobre un ícono principal (por ejemplo, “Monitoreo de Crédito”), los subtemas relacionados podrían resaltarse (cambiar de color, agrandarse) y mostrarse una breve descripción.
+Podrías usar animaciones sutiles como un ligero resplandor en el núcleo (Andy AI) y líneas conectando las funciones, simulando un circuito o una red neural financiera.
+Referencias Visuales:
+
+Paleta de colores inspirada en tecnología, algo futurista: azules oscuros, morados, con destellos en cian o violeta.
+Estilo minimalista pero elegante, íconos simples y reconocibles.
+Andy AI en el centro podría ser representado por un ícono circular (por ejemplo, una cara amigable estilizada, o el acrónimo “AI” dentro de un círculo iluminado).
+Ventajas de este Diseño:
+
+Intuitivo: El usuario ve a Andy AI en el centro, y entiende que es el “cerebro” o la entidad principal.
+Rápido acceso: Desde el centro puede navegar a las funcionalidades clave sin perderse en menús complejos.
+Fácil Expansión: Si agregas más funciones en el futuro, puedes añadir más orbitas u otro anillo alrededor sin romper la metáfora visual.
+Estético y Distintivo: Un diseño tipo “reactor” o “átomo” da una sensación moderna, tecnológica y única, alineada con la idea de Andy AI como un asistente avanzado.
