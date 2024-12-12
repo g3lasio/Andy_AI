@@ -86,9 +86,8 @@ Por favor, cuéntame, ¿cuáles son tus principales objetivos financieros? Por e
       sender: 'user'
     };
 
-    // Immediately update UI with user message
     setMessages(prev => [...prev, userMessage]);
-    setInput(""); // Clear input right after sending
+    setInput("");
 
     // Show typing indicator
     const typingMessage: Message = {
@@ -218,7 +217,7 @@ Por favor, cuéntame, ¿cuáles son tus principales objetivos financieros? Por e
           onChange={(e) => setInput(e.target.value)}
           placeholder="Escribe tu mensaje..."
           className="flex-1"
-          disabled={isAnalyzing}
+          disabled={false}
           onKeyDown={(e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault();
