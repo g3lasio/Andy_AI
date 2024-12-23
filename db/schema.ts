@@ -26,7 +26,11 @@ export const transactions = pgTable("transactions", {
   amount: decimal("amount").notNull(),
   category: text("category"),
   description: text("description"),
-  date: timestamp("date").defaultNow()
+  date: timestamp("date").defaultNow(),
+  plaidId: text("plaid_id").unique(),
+  merchantName: text("merchant_name"),
+  accountId: text("account_id"),
+  pending: boolean("pending").default(false)
 });
 
 export const creditReports = pgTable("credit_reports", {
