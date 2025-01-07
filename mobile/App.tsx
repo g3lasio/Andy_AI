@@ -1,32 +1,25 @@
-
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaView, StatusBar, StyleSheet } from 'react-native';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { queryClient } from '../src/lib/queryClient';
 import AIChat from './components/AIChat';
-import Dashboard from './components/Dashboard';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="light-content" />
-        <Stack.Navigator 
-          initialRouteName="Dashboard"
-          screenOptions={{
-            headerStyle: {
-              backgroundColor: '#000',
-            },
-            headerTintColor: '#fff',
-          }}
-        >
-          <Stack.Screen name="Dashboard" component={Dashboard} />
-          <Stack.Screen name="AIChat" component={AIChat} />
-        </Stack.Navigator>
-      </SafeAreaView>
-    </NavigationContainer>
+    <QueryClientProvider client={queryClient}>
+      <NavigationContainer>
+        <SafeAreaView style={styles.container}>
+          <StatusBar barStyle="light-content" />
+          <Stack.Navigator>
+            <Stack.Screen name="AIChat" component={AIChat} options={{ title: 'Andy AI' }} />
+          </Stack.Navigator>
+        </SafeAreaView>
+      </NavigationContainer>
+    </QueryClientProvider>
   );
 }
 
