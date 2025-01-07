@@ -1,4 +1,5 @@
 import express from "express";
+import cors from 'cors';
 import { createServer } from "http";
 import { setupVite, serveStatic } from "./vite";
 import chatRouter from "./routes/chat";
