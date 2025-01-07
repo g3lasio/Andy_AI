@@ -1,48 +1,52 @@
-import express from "express";
+
+import express from 'express';
 import cors from 'cors';
-import { createServer } from "http";
-import { setupVite, serveStatic } from "./vite";
-import chatRouter from "./routes/chat";
+import { createLinkToken, exchangePublicToken, fetchAndStoreTransactions } from './services/plaid.service';
+import { analyzeFile } from './services/ai.service';
 
 const app = express();
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-const server = createServer(app);
+const port = 4000;
 
-// Basic middleware
+app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// Simple logging middleware
-app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} ${req.method} ${req.url}`);
-  next();
+// Plaid routes
+app.post('/api/plaid/create-link', async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const linkToken = await createLinkToken(userId);
+    res.json({ linkToken });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
-// Chat route
-app.use("/api/chat", chatRouter);
-
-// Start server function
-const startServer = async () => {
+app.post('/api/plaid/set-access-token', async (req, res) => {
   try {
-    const PORT = process.env.PORT || 4000; // Cambiado a 4000
-
-    if (process.env.NODE_ENV !== "production") {
-      await setupVite(app, server);
-    } else {
-      serveStatic(app);
-    }
-
-    server.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
+    const { publicToken } = req.body;
+    const accessToken = await exchangePublicToken(publicToken);
+    res.json({ accessToken });
   } catch (error) {
-    console.error("Server error:", error);
-    process.exit(1);
+    res.status(500).json({ error: error.message });
   }
-};
+});
 
-startServer();
+// Chat routes
+app.post('/api/chat/financial-advice', async (req, res) => {
+  try {
+    const { message } = req.body;
+    const response = await analyzeFile([{ 
+      name: 'chat.txt', 
+      type: 'txt', 
+      url: '/tmp/chat.txt', 
+      size: message.length 
+    }]);
+    res.json({ response });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.listen(port, '0.0.0.0', () => {
+  console.log(`Server running on port ${port}`);
+});
