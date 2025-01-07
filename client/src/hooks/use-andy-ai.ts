@@ -27,7 +27,7 @@ async function sendMessage(message: string): Promise<{
   analysis?: AIAnalysis;
 }> {
   try {
-    const response = await fetch('/api/chat', {
+    const response = await fetch('http://0.0.0.0:3000/api/chat', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -15,8 +15,10 @@ interface FinancialData {
 }
 
 export function useFinancialData(): FinancialData {
+  const baseUrl = 'http://0.0.0.0:3000'; // Added base URL
+
   const { data: creditData, isLoading: creditLoading } = useQuery<CreditReport>({
-    queryKey: ["/api/credit/score"],
+    queryKey: [`${baseUrl}/api/credit/score`], // Updated queryKey
   });
 
   const { data: transactionData, isLoading: transactionLoading } = useQuery<{
@@ -26,7 +28,7 @@ export function useFinancialData(): FinancialData {
     transactions: Transaction[];
     trends: Array<{ date: string; balance: number }>;
   }>({
-    queryKey: ["/api/transactions/summary"],
+    queryKey: [`${baseUrl}/api/transactions/summary`], // Updated queryKey
   });
 
   return {
