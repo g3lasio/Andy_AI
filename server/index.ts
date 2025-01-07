@@ -4,6 +4,11 @@ import { setupVite, serveStatic } from "./vite";
 import chatRouter from "./routes/chat";
 
 const app = express();
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 const server = createServer(app);
 
 // Basic middleware
