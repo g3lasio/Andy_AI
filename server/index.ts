@@ -17,12 +17,12 @@ app.use((req, res, next) => {
 });
 
 // Chat route
-app.use('/api/chat', chatRouter);
+app.use("/api/chat", chatRouter);
 
 // Start server function
 const startServer = async () => {
   try {
-    const PORT = process.env.PORT || 3000;
+    const PORT = process.env.PORT || 4000; // Cambiado a 4000
 
     if (process.env.NODE_ENV !== "production") {
       await setupVite(app, server);
@@ -34,7 +34,7 @@ const startServer = async () => {
       console.log(`Server running on port ${PORT}`);
     });
   } catch (error) {
-    console.error('Server error:', error);
+    console.error("Server error:", error);
     process.exit(1);
   }
 };
