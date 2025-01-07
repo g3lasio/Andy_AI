@@ -12,12 +12,13 @@
       "@utils/*": ["src/utils/*"],
       "@api/*": ["src/api/*"],
       "@types/*": ["src/types/*"],
-      "@assets/*": ["assets/*"]
+      "@assets/*": ["src/assets/*"],
+      "@lib/*": ["src/lib/*"]
     }
   },
   "include": [
-    "**/*.ts",
-    "**/*.tsx",
+    "src/**/*",
+    "server/**/*",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
   ]
